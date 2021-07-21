@@ -36,6 +36,8 @@ add_executable(ex4_sol_cgns
 )
 
 add_executable(ex4_hdf5
+  PhastH5File.cpp
+  PhastH5File.h
   read_ex4_hdf5.cpp
 )
 
