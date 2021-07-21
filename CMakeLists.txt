@@ -14,6 +14,10 @@ include(GNUInstallDirs)
 #   find_package(OpenMP REQUIRED)
 # endif()
 
+set(CMAKE_PREFIX_PATH "C:/Users/charlton/source/repos/iricdev-2019/lib/install/cgnslib-4.1.1-patch1/release;C:/Users/charlton/source/repos/iricdev-2019/lib/install/hdf5-1.8.21/cmake/hdf5")
+
+find_package(HDF5 1.8 REQUIRED)
+
 find_path(CGNS_INC cgnslib.h)
 include_directories("${CGNS_INC}")
 
@@ -30,6 +34,11 @@ add_executable(ex4_cgns
 add_executable(ex4_sol_cgns
   write_ex4_solution.cpp
 )
+
+add_executable(ex4_hdf5
+  read_ex4_hdf5.cpp
+)
+
 
 # # default real kind 8
 # if(CMAKE_Fortran_COMPILER_ID STREQUAL Intel)
@@ -55,6 +64,8 @@ target_compile_definitions(ex4_sol_cgns PRIVATE _CRT_SECURE_NO_WARNINGS)
 target_include_directories(ex4_sol_cgns PRIVATE ${CGNS_INC})
 target_link_libraries(ex4_sol_cgns PRIVATE ${CGNS_LIBRARY})
 
+target_compile_definitions(ex4_hdf5 PRIVATE _CRT_SECURE_NO_WARNINGS)
+target_link_libraries(ex4_hdf5 PRIVATE hdf5::hdf5_cpp-shared)
 
 # if(IRIC_SOLVER_USE_OPENMP AND OpenMP_Fortran_FOUND)
 #   target_link_libraries(Fastmech PRIVATE OpenMP::OpenMP_Fortran)
