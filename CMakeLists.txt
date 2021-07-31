@@ -14,7 +14,8 @@ include(GNUInstallDirs)
 #   find_package(OpenMP REQUIRED)
 # endif()
 
-set(CMAKE_PREFIX_PATH "C:/Users/charlton/source/repos/iricdev-2019/lib/install/cgnslib-4.1.1-patch1/release;C:/Users/charlton/source/repos/iricdev-2019/lib/install/hdf5-1.8.21/cmake/hdf5")
+#set(CMAKE_PREFIX_PATH "C:/Users/charlton/source/repos/coupled/iricdev-2019/lib/install/cgnslib-4.1.1-patch1/release;C:/Users/charlton/source/repos/coupled/iricdev-2019/lib/install/hdf5-1.8.21/cmake/hdf5")
+set(CMAKE_PREFIX_PATH "C:/Users/charlton/source/repos/coupled/iricdev-2019/lib/install/hdf5-1.8.21/cmake/hdf5;C:/Users/charlton/source/repos/coupled/iricdev-2019/lib/install/cgnslib-4.1.1-patch1/release")
 
 find_package(HDF5 1.8 REQUIRED)
 
@@ -34,6 +35,8 @@ add_executable(ex4_cgns
 add_executable(ex4_sol_cgns
   write_ex4_solution.cpp
 )
+
+configure_file(ex4.h5 ex4.h5 COPYONLY)
 
 add_executable(ex4_hdf5
   PhastH5File.cpp
@@ -94,4 +97,10 @@ if (WIN32)
   add_custom_command(TARGET write_c POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CGNS_INC}/../bin/cgnsdll.dll"   "$<TARGET_FILE_DIR:write_c>"
     )
+
+  add_custom_command(TARGET ex4_hdf5 POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:hdf5::hdf5-shared>"       "$<TARGET_FILE_DIR:ex4_hdf5>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:hdf5::hdf5_cpp-shared>"   "$<TARGET_FILE_DIR:ex4_hdf5>"
+    )
+
 endif()

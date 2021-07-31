@@ -1,5 +1,7 @@
 #include "PhastH5File.h"
 
+#include <iostream>
+
 
 PhastH5File::PhastH5File(const char* name, unsigned int flags,
     const FileCreatPropList& create_plist,
@@ -12,7 +14,7 @@ std::vector<std::string> PhastH5File::getFixedStrings(const std::string& path)
 {
     hsize_t dims[2], maxdims[2];
 
-    DataSet dataset = this->openDataSet(path);
+    DataSet dataset = openDataSet(path);
     DataSpace dataspace = dataset.getSpace();
     int ndims = dataspace.getSimpleExtentDims(dims, maxdims);
 
@@ -58,10 +60,52 @@ std::vector<std::string> PhastH5File::getFixedStrings(const std::string& path)
 
 std::vector<std::string> PhastH5File::getTimeSteps()
 {
-    return getFixedStrings("/TimeSteps");
+    if (m_timesteps.empty()) {
+        m_timesteps = getFixedStrings("/TimeSteps");
+    }
+    return m_timesteps;
+}
+
+size_t PhastH5File::getTimeStepCount()
+{
+    return getTimeSteps().size();
 }
 
 std::vector<std::string> PhastH5File::getScalars()
 {
-    return getFixedStrings("/Scalars");
+    if (m_scalars.empty()) {
+        m_scalars = getFixedStrings("/Scalars");
+    }
+    return m_scalars;
+}
+
+size_t PhastH5File::getScalarCount()
+{
+    return getScalars().size();
+}
+
+std::vector<double> PhastH5File::getActiveArray(int time_idx)
+{
+    std::vector<std::string> timesteps = getTimeSteps();
+    if (time_idx < 0) throw new std::exception();
+    if (time_idx >= m_timesteps.size()) throw new std::exception();
+    return getActiveArray(m_timesteps[time_idx]);
+}
+
+std::vector<double> PhastH5File::getActiveArray(const std::string& timestep)
+{
+    hsize_t dims[2], maxdims[2];
+    DataSet dataset = openDataSet(std::string("/") + timestep + "/ActiveArray");
+    DataSpace dataspace = dataset.getSpace();
+
+    int ndims = dataspace.getSimpleExtentDims(dims, maxdims);
+
+    std::cout << "ndims = " << ndims << std::endl;
+    std::cout << "dims[0] = " << dims[0] << std::endl;
+    std::cout << "maxdims[0] = " << maxdims[0] << std::endl;
+
+    std::vector<double> active(dims[0], 0.0);
+    dataset.read(active.data(), PredType::NATIVE_DOUBLE);
+
+    return active;
 }

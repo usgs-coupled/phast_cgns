@@ -14,6 +14,7 @@ int main (void)
 
     std::vector<std::string> steps = file.getTimeSteps();
     std::vector<std::string> scalars = file.getScalars();
+    file.getActiveArray(0);
 
     std::vector< std::string > cs = { "/Grid/X", "/Grid/Y" , "/Grid/Z" };
     std::vector< std::vector<double> > coords;
